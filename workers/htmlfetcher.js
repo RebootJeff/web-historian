@@ -10,12 +10,8 @@ var connection = mysql.createConnection({
 });
 
 var fetchHTML = function(){
-  connection.connect();
   var helpers = require('./lib/html-fetcher-helpers');
   var path = require('path');
-
-  // var filePath = path.join(__dirname, "../data/sites.txt");
-  // helpers.readUrls(filePath, helpers.downloadUrls);
 
   connection.query('select * from siteIndex', function(err, rows){
     var urlList = [];
@@ -27,8 +23,6 @@ var fetchHTML = function(){
 
     helpers.downloadUrls(row.url, row.filepath);
   });
-
-  connection.end();
 };
 
 setInterval(fetchHTML, 5000);

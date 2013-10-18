@@ -18,10 +18,9 @@ module.exports.handleRequest = function (req, res) {
   var fileLocation;
   var pathname = url.parse(req.url).pathname;
 
-  var setResponseBodyFromFile = function(fileLocation){
-    var responseBody, statusCode;
+  var setResponseBodyFromFile = function(statusCode, fileLocation){
+    var responseBody;
     if(fs.existsSync(fileLocation)){
-      statusCode = 302;
       responseBody = fs.readFileSync(fileLocation, 'utf8');
     } else {
       statusCode = 404;
@@ -47,9 +46,13 @@ module.exports.handleRequest = function (req, res) {
 
   switch(req.method){
     case 'GET':
+      // TODO: create a separate helper function to serve any static assets
       if (pathname === '/') {
         fileLocation = path.join(__dirname, '../web/public/index.html');
-        setResponseBodyFromFile(fileLocation);
+        setResponseBodyFromFile(200, fileLocation);
+      } else {
+        fileLocation = path.join(__dirname, '../web/public' + pathname);
+        setResponseBodyFromFile(200, fileLocation);
       }
       break;
 
@@ -66,7 +69,7 @@ module.exports.handleRequest = function (req, res) {
           if(rows.length){
             console.log('rows',rows);
             fileLocation = rows[0].filepath;
-            setResponseBodyFromFile(fileLocation);
+            setResponseBodyFromFile(200, fileLocation);
           } else {
             fileLocation = path.join(__dirname, '../data/sites/');
             var SQLStatement = 'insert into siteIndex (url, filepath) values (' +
@@ -86,5 +89,4 @@ module.exports.handleRequest = function (req, res) {
     default:
       completeResponse(404, 'Not found');
   }
-  console.log('test');
 };
